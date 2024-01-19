@@ -22,16 +22,16 @@ class Summary final : public Metric {
   std::vector<double>                                          quantiles_;
 
  public:
-  Summary(const MetricKey&           key,
+  Summary(const MetricKey           &key,
           std::chrono::milliseconds  observation_time,
-          const std::vector<double>& quantiles)
+          const std::vector<double> &quantiles)
       : Metric(key),  //
         observation_time_(observation_time),
         quantiles_(quantiles){};
 
-  void observe(double value);
+  void measure(double value);
 
-  virtual void collect(std::string& out) override;
+  virtual void collect(std::string &out) override;
 };
 
 class SummaryBuilder : public MetricBuilder<Summary, SummaryBuilder> {
@@ -39,20 +39,22 @@ class SummaryBuilder : public MetricBuilder<Summary, SummaryBuilder> {
   std::vector<double>       quantiles_;
 
  public:
-  SummaryBuilder& observation_time(std::chrono::milliseconds observation_time) {
+  SummaryBuilder &observation_time(std::chrono::milliseconds observation_time) {
     observation_time_ = observation_time;
     return *this;
   }
 
   template <typename... Args>
-  SummaryBuilder& quantiles(Args&&... args) {
+  SummaryBuilder &quantiles(Args &&...args) {
     (quantiles_.push_back(args), ...);
     return *this;
   }
 
-  virtual void measure(double value) override {
-    build(observation_time_, quantiles_).observe(value);
+  virtual Summary &get() override {
+    return build(observation_time_, quantiles_);
   };
+
+  virtual void measure(double value) override { get().measure(value); };
 };
 
 }  // namespace telemetry

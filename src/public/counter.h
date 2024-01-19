@@ -14,15 +14,17 @@ class Counter final : public Metric {
  public:
   Counter(const MetricKey& key) : Metric(key), value_(0){};
 
-  void increment();
-  void add(uint64_t value);
+  void         increment();
+  int          value() const;
+  virtual void measure(double value) override;
 
   virtual void collect(std::string& out) override;
 };
 
 class CounterBuilder : public MetricBuilder<Counter, CounterBuilder> {
  public:
-  virtual void measure(double value) override { build().add(value); }
+  virtual Counter& get() override { return build(); };
+  virtual void     measure(double value) override { get().measure(value); }
 };
 
 }  // namespace telemetry

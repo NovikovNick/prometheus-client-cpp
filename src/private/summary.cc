@@ -5,7 +5,7 @@
 
 namespace telemetry {
 
-void Summary::observe(double value) {
+void Summary::measure(double value) {
   Timepoint now     = Clock::now();
   Timepoint expired = now - observation_time_;
 

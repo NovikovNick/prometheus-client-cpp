@@ -14,14 +14,15 @@ class Gauge final : public Metric {
  public:
   Gauge(const MetricKey& key) : Metric(key), value_(0.0){};
 
-  void set(double value);
+  virtual void measure(double value) override;
 
   virtual void collect(std::string& out) override;
 };
 
 class GaugeBuilder : public MetricBuilder<Gauge, GaugeBuilder> {
  public:
-  virtual void measure(double value) override { build().set(value); }
+  virtual Gauge& get() override { return build(); };
+  virtual void   measure(double value) override { get().measure(value); }
 };
 
 }  // namespace telemetry

@@ -5,9 +5,13 @@
 
 namespace telemetry {
 
-void Counter::increment() { add(1); };
+void Counter::increment() { measure(1.0); }
 
-void Counter::add(uint64_t value) { value_.fetch_add(value); };
+int Counter::value() const { return static_cast<int>(value_.load()); };
+
+void Counter::measure(double value) {
+  value_.fetch_add(static_cast<int>(value));
+};
 
 void Counter::collect(std::string& out) {
   out += std::format("# HELP {} {}\n", key_.name, key_.description);

@@ -5,7 +5,7 @@
 
 namespace telemetry {
 
-void Gauge::set(double value) { value_.store(value); };
+void Gauge::measure(double value) { value_.store(value); };
 
 void Gauge::collect(std::string& out) {
   out += std::format("# HELP {} {}\n", key_.name, key_.description);

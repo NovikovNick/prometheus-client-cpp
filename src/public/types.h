@@ -16,6 +16,7 @@ class Metric {
   Metric(const MetricKey& key) : key_(key) {}
 
   virtual void collect(std::string& out) = 0;
+  virtual void measure(double value)     = 0;
   virtual ~Metric()                      = default;
 
  protected:
@@ -66,19 +67,16 @@ struct MetricBuilder {
     return static_cast<Self&>(*this);
   };
 
-  // Metric& ifNotExist(std::function<void(Self&)> cb) {
-  //   cb(static_cast<Self&>(*this));
-  //   return Metric{};
-  // };
-
-  virtual void measure(double value) = 0;
-
-  virtual ~MetricBuilder() = default;
+  virtual void    measure(double value) = 0;
+  virtual Metric& get()                 = 0;
+  virtual ~MetricBuilder()              = default;
 
  protected:
   template <typename... Args>
   Metric& build(Args&&... args) {
-    // todo: refactoring
+    // Although this code can be executed concurrently, I think adding a mutex
+    // here is bad idea. For monitoring metrics, performance is better than
+    // 100% accuracy
     auto& metrics = MetricRegistry::instance().metrics_;
 
     if (auto it = metrics.find(key_); it != metrics.end()) {

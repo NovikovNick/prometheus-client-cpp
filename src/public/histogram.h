@@ -24,7 +24,7 @@ class Histogram final : public Metric {
     }
   };
 
-  void observe(double value);
+  void measure(double value);
 
   virtual void collect(std::string& out) override;
 };
@@ -39,9 +39,9 @@ class HistogramBuilder : public MetricBuilder<Histogram, HistogramBuilder> {
     return *this;
   }
 
-  virtual void measure(double value) override {
-    build(buckets_).observe(value);
-  }
+  virtual Histogram& get() override { return build(buckets_); };
+
+  virtual void measure(double value) override { get().measure(value); }
 };
 
 }  // namespace telemetry

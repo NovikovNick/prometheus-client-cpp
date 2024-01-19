@@ -6,7 +6,7 @@
 
 namespace telemetry {
 
-void Histogram::observe(double value) {
+void Histogram::measure(double value) {
   auto lk = std::unique_lock(mutex_);
   for (auto& [backet, counter] : buckets_) {
     if (value <= backet) {
