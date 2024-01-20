@@ -4,6 +4,7 @@
 #include <atomic>
 #include <format>
 #include <memory>
+#include <mutex>
 #include <string>
 #include <unordered_map>
 
@@ -38,8 +39,12 @@ class MetricRegistry {
   MetricRegistry(const MetricRegistry&)            = delete;
   MetricRegistry& operator=(const MetricRegistry&) = delete;
 
+  std::mutex mx;
+
  public:
   std::unordered_map<MetricKey, std::shared_ptr<Metric>> metrics_;
+
+  std::unique_lock<std::mutex> lock() { return std::unique_lock(mx); }
 
   static MetricRegistry& instance() {
     static MetricRegistry inst;
@@ -74,11 +79,9 @@ struct MetricBuilder {
  protected:
   template <typename... Args>
   Metric& build(Args&&... args) {
-    // Although this code can be executed concurrently, I think adding a mutex
-    // here is bad idea. For monitoring metrics, performance is better than
-    // 100% accuracy
-    auto& metrics = MetricRegistry::instance().metrics_;
-
+    auto& registry = MetricRegistry::instance();
+    auto& metrics  = registry.metrics_;
+    auto  lock     = registry.lock();
     if (auto it = metrics.find(key_); it != metrics.end()) {
       return static_cast<Metric&>(*(it->second.get()));
     } else {

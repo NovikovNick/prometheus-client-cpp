@@ -13,6 +13,10 @@ static void BM_Histogram_Preinited(benchmark::State &state) {
 BENCHMARK(BM_Histogram_Preinited);
 
 static void BM_Histogram_Dynamic(benchmark::State &state) {
+  telemetry::histogram()  //
+      .name("BM_Histogram_Dynamic")
+      .buckets(0.5, 1.0, 2.0)
+      .measure(0);
   while (state.KeepRunning()) {
     telemetry::histogram()  //
         .name("BM_Histogram_Dynamic")

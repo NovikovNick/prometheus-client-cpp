@@ -98,6 +98,53 @@ BENCHMARK(BM_Vector_Creation)
     ->Arg(100000)
     ->Arg(1000000);  // more is better to execute to another thread
 
+struct Node {
+  int   val  = 0;
+  Node *next = nullptr;
+};
+
+static void BM_LinkedList_Access(benchmark::State &state) {
+  Node dummy;
+  {
+    Node *curr = &dummy;
+    for (int i = 0; i < state.range(0); ++i) {
+      curr->next = new Node();
+      curr       = curr->next;
+    }
+  }
+
+  while (state.KeepRunning()) {
+    Node *curr = &dummy;
+    while (curr) {
+      curr = curr->next;
+    }
+  }
+}
+BENCHMARK(BM_LinkedList_Access)  //
+    ->Arg(1)
+    ->Arg(10)
+    ->Arg(100)
+    ->Arg(1000)
+    ->Arg(10000);
+
+static void BM_String_Hash(benchmark::State &state) {
+  std::string str = "";
+  for (int i = 0; i < state.range(0); ++i) {
+    str += '#';
+  }
+  std::hash<std::string> hasher;
+  while (state.KeepRunning()) {
+    [[maybe_unused]] auto hash = hasher(str);
+  }
+}
+BENCHMARK(BM_String_Hash)  //
+    ->Arg(1)
+    ->Arg(10)
+    ->Arg(100)
+    ->Arg(1000)
+    ->Arg(10000)
+    ->Arg(100000);
+
 static void BM_Thread_Creation(benchmark::State &state) {
   while (state.KeepRunning()) {
     std::jthread([]() {});

@@ -12,6 +12,9 @@ static void BM_Gauge_Preinited(benchmark::State &state) {
 BENCHMARK(BM_Gauge_Preinited);
 
 static void BM_Gauge_Dynamic(benchmark::State &state) {
+  telemetry::gauge()  //
+      .name("BM_Gauge_Dynamic")
+      .measure(0);
   while (state.KeepRunning()) {
     telemetry::gauge()  //
         .name("BM_Gauge_Dynamic")

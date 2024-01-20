@@ -12,6 +12,9 @@ static void BM_Counter_Preinited(benchmark::State &state) {
 BENCHMARK(BM_Counter_Preinited);
 
 static void BM_Counter_Dynamic(benchmark::State &state) {
+  telemetry::counter()  //
+      .name("BM_Counter_Preinited")
+      .measure(0);
   while (state.KeepRunning()) {
     telemetry::counter()  //
         .name("BM_Counter_Preinited")

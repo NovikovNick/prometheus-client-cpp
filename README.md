@@ -3,13 +3,14 @@
 Work in progress...
 
 ## Build with CMake on *nix system
+Required: gcc 13
 
 ```shell
 git clone https://github.com/NovikovNick/prometheus-client-cpp.git -b develop
-cd prometheus-client-cpp        # Main directory of the cloned repository.
-mkdir build                     # Create a directory to hold the build output.
+cd prometheus-client-cpp                                   # Main directory of the cloned repository.
+mkdir build                                                # Create a directory to hold the build output.
 cd build
-cmake ..                        # Generate native build scripts for project.
+cmake .. -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-13     # Generate native build scripts for project.
 make
 ```
 
@@ -59,10 +60,19 @@ rss.measure(42);
 metric_histogram.measure(0.42);
 ```
 
-## Benchmarks and tests
-1. Enable in CMake option ENABLE_TESTS
-2. Install <https://github.com/google/googletest>
-3. Install <https://github.com/google/benchmark>
+## Tests
+1. Install <https://github.com/google/googletest>
+2. ```mkdir build && cd build```
+2. ```cmake .. -DENABLE_TESTS=ON -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-13```
+3. ```make```
+6. Run ```./test/telemetry_test```
+
+## Benchmarks
+1. Install <https://github.com/google/benchmark>
+2. ```mkdir build && cd build```
+2. ```cmake .. -DENABLE_BENCHMARKS=ON -DCMAKE_CXX_COMPILER:FILEPATH=/usr/bin/g++-13```
+3. ```make```
+3. Run ```./benchmark/benchmarks```
 
 ## License
 
