@@ -8,17 +8,25 @@
 
 namespace telemetry {
 
+/// @brief Single numerical value that can arbitrarily go up and down.
+///
+/// https://prometheus.io/docs/concepts/metric_types/#gauge
+///
 class Gauge final : public Metric {
   std::atomic<double> value_;
 
- public:
-  Gauge(const MetricKey& key) : Metric(key), value_(0.0){};
+  Gauge(const MetricKey& key);
 
-  virtual void measure(double value) override;
+ public:
+  void measure(double value);
 
   virtual void collect(std::string& out) override;
+
+  friend MetricRegistry;
 };
 
+/// @brief builder with access to the metrics registry
+///
 class GaugeBuilder : public MetricBuilder<Gauge, GaugeBuilder> {
  public:
   virtual Gauge& get() override { return build(); };

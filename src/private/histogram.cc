@@ -6,6 +6,13 @@
 
 namespace telemetry {
 
+Histogram::Histogram(const MetricKey& key, const std::vector<double>& buckets)
+    : Metric(key), sum(0) {
+  for (auto bucket : buckets) {
+    buckets_[bucket] = 0;
+  }
+};
+
 void Histogram::measure(double value) {
   auto lk = std::unique_lock(mutex_);
   for (auto& [backet, counter] : buckets_) {
@@ -29,8 +36,8 @@ void Histogram::collect(std::string& out) {
   for (auto [backet, counter] : buckets_) {
     count += counter;
     out += std::format("{}_bucket", key_.name);
-    key_.tags["le"] = std::to_string(backet);
-    collectTags(out);
+    key_.labels["le"] = std::to_string(backet);
+    collectLabels(out);
     out += std::format(" {}\n", counter);
   }
 

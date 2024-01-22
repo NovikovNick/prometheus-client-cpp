@@ -19,6 +19,7 @@ if(ENABLE_BENCHMARKS)
 endif()
 
 set(TELEMETRY_SRC 
+    src/private/core/metric.cc
     src/private/counter.cc
     src/private/gauge.cc
     src/private/histogram.cc

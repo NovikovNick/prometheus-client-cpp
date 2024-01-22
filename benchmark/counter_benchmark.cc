@@ -13,12 +13,22 @@ BENCHMARK(BM_Counter_Preinited);
 
 static void BM_Counter_Dynamic(benchmark::State &state) {
   telemetry::counter()  //
-      .name("BM_Counter_Preinited")
+      .name("BM_Counter_Dynamic")
       .measure(0);
   while (state.KeepRunning()) {
     telemetry::counter()  //
-        .name("BM_Counter_Preinited")
+        .name("BM_Counter_Dynamic")
         .measure(1);
   }
 }
 BENCHMARK(BM_Counter_Dynamic);
+
+static void BM_Counter_Creation(benchmark::State &state) {
+  int i = 0;
+  while (state.KeepRunning()) {
+    telemetry::counter()  //
+        .name("BM_Counter_Dynamic#" + std::to_string(++i))
+        .measure(0);
+  }
+}
+BENCHMARK(BM_Counter_Creation);

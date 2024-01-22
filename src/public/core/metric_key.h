@@ -5,14 +5,17 @@
 #include <unordered_map>
 
 namespace telemetry {
+
+/// @brief Every metric is uniquely identified by its metric name and optional
+/// key-value pairs called labels.
 struct MetricKey {
   std::string                                  name;
+  std::unordered_map<std::string, std::string> labels;
   std::string                                  description;
-  std::unordered_map<std::string, std::string> tags;
 
   bool operator==(const MetricKey& other) const {
-    return name == other.name        //
-               ? tags == other.tags  //
+    return name == other.name            //
+               ? labels == other.labels  //
                : false;
   };
 };

@@ -21,7 +21,7 @@ make
 // Dynamic metric can be useful to track all http url in tags
 telemetry::summary()
     .name("your_service_http_request_duration_seconds")
-    .tag("path", url)
+    .label("path", url)
     .description("A summary of the http request duration.")
     .observation_time(minutes{1})
     .quantiles(0.5, 0.9, 0.95, 1.0)
@@ -30,7 +30,7 @@ telemetry::summary()
 // ...but preinited metric is an order of magnitude cheaper
 auto& metric_summary = telemetry::summary()
     .name("your_service_http_request_duration_seconds")
-    .tag("path", "/foo/bar")
+    .label("path", "/foo/bar")
     .description("A summary of the http request duration.")
     .observation_time(minutes{1})
     .quantiles(0.5, 0.9, 0.95, 1.0)

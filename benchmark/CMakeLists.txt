@@ -4,6 +4,7 @@ add_executable(benchmarks
   gauge_benchmark.cc
   histogram_benchmark.cc
   summary_benchmark.cc
+  collect_benchmark.cc
   standart_operations_benchmark.cc
 )
 

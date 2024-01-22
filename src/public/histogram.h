@@ -11,24 +11,29 @@
 
 namespace telemetry {
 
+/// @brief A histogram samples observations (usually things like request
+/// durations or response sizes) and counts them in configurable buckets. It
+/// also provides a sum of all observed values.
+///
+/// https://prometheus.io/docs/concepts/metric_types/#histogram
+///
 class Histogram final : public Metric {
   std::mutex                mutex_;
   double                    sum;
   std::map<double, int64_t> buckets_;
 
- public:
-  Histogram(const MetricKey& key, const std::vector<double>& buckets)
-      : Metric(key), sum(0) {
-    for (auto bucket : buckets) {
-      buckets_[bucket] = 0;
-    }
-  };
+  Histogram(const MetricKey& key, const std::vector<double>& buckets);
 
+ public:
   void measure(double value);
 
   virtual void collect(std::string& out) override;
+
+  friend MetricRegistry;
 };
 
+/// @brief builder with access to the metrics registry
+///
 class HistogramBuilder : public MetricBuilder<Histogram, HistogramBuilder> {
   std::vector<double> buckets_;
 

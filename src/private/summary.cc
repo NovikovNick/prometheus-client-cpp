@@ -4,10 +4,16 @@
 #include <format>
 
 namespace telemetry {
+Summary::Summary(const MetricKey&           key,
+                 std::chrono::milliseconds  sliding_time_window,
+                 const std::vector<double>& quantiles)
+    : Metric(key),  //
+      sliding_time_window_(sliding_time_window),
+      quantiles_(quantiles){};
 
 void Summary::measure(double value) {
   Timepoint now     = Clock::now();
-  Timepoint expired = now - observation_time_;
+  Timepoint expired = now - sliding_time_window_;
 
   auto lk = std::unique_lock(mutex_);
   auto it = values_.insert(value);
@@ -56,8 +62,8 @@ void Summary::collect(std::string& out) {
       value   = d0 + d1;
     }
     out += std::format("{}", key_.name);
-    key_.tags["quantile"] = std::to_string(quantile);
-    collectTags(out);
+    key_.labels["quantile"] = std::to_string(quantile);
+    collectLabels(out);
     out += std::format(" {}\n", value);
   }
 

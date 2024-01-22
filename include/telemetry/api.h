@@ -15,9 +15,8 @@ inline HistogramBuilder histogram() { return HistogramBuilder{}; };
 inline SummaryBuilder   summary() { return SummaryBuilder{}; };
 
 inline void collect(std::string& out) {
-  for (auto [title, metric] : MetricRegistry::instance().metrics_) {
-    metric->collect(out);
-  }
+  MetricRegistry::instance()  //
+      .forEach([&out](Metric* metric) { metric->collect(out); });
 }
 
 }  // namespace telemetry
