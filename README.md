@@ -15,49 +15,56 @@ make
 ```
 
 ## Usage
-``` c++
+```c++
 #include <telemetry/api.h>
 
-// Dynamic metric can be useful to track all http url in tags
-telemetry::summary()
-    .name("your_service_http_request_duration_seconds")
-    .label("path", url)
-    .description("A summary of the http request duration.")
-    .observation_time(minutes{1})
-    .quantiles(0.5, 0.9, 0.95, 1.0)
-    .measure(0.42);
+// Dynamic metric can be useful to track some dynamic data in labels
+  telemetry::summary()
+      .name("your_service_http_request_duration_seconds")
+      .label("path", url)
+      .description("A summary of the http request duration.")
+      .sliding_time_window(minutes{1})
+      .quantiles(0.5, 0.9, 0.95, 1.0)
+      .measure(0.42);
 
-// ...but preinited metric is an order of magnitude cheaper
-auto& metric_summary = telemetry::summary()
-    .name("your_service_http_request_duration_seconds")
-    .label("path", "/foo/bar")
-    .description("A summary of the http request duration.")
-    .observation_time(minutes{1})
-    .quantiles(0.5, 0.9, 0.95, 1.0)
-    .get();
-metric_summary.measure(0.42);
+  // ...but preinited metric is an order of magnitude cheaper
+  auto& metric_summary =
+      telemetry::summary()
+          .name("your_service_http_request_duration_seconds")
+          .label("path", "/foo/bar")
+          .description("A summary of the http request duration.")
+          .sliding_time_window(minutes{1})
+          .quantiles(0.5, 0.9, 0.95, 1.0)
+          .get();
+  metric_summary.measure(0.42);
 
-// other metrics
+  // other metrics
 
-auto& request_count = telemetry::counter()
-    .name("your_service_http_request_count")
-    .description("Total http requests")
-    .get();
+  auto& request_count = telemetry::counter()
+                            .name("your_service_http_request_count")
+                            .description("Total http requests")
+                            .get();
 
-auto& rss = telemetry::gauge()
-    .name("your_service_memory_consumtion")
-    .description("Memory consumption")
-    .get();
+  auto& rss = telemetry::gauge()
+                  .name("your_service_memory_consumtion")
+                  .description("Memory consumption")
+                  .get();
 
-auto& http_duration_sec = telemetry::histogram()
-    .name("your_service_http_request_duration_seconds")
-    .description("Total http requests")
-    .backets(0.1, 1.0, 5.0)
-    .get();
+  auto& http_duration_sec =
+      telemetry::histogram()
+          .name("your_service_http_request_duration_seconds")
+          .description("Total http requests")
+          .buckets(0.1, 1.0, 5.0)
+          .get();
 
-request_count.measure(1);
-rss.measure(42);
-metric_histogram.measure(0.42);
+  request_count.measure(1);
+  rss.measure(42);
+  http_duration_sec.measure(0.42);
+
+  // write prometheus data for endpoint /metrics
+  std::string out;
+  telemetry::collect(out);
+  output_stream << out;
 ```
 
 ## Tests

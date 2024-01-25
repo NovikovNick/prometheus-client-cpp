@@ -14,6 +14,7 @@ namespace telemetry {
 ///
 class Gauge final : public Metric {
   std::atomic<double> value_;
+  std::string         metric_description_;
 
   Gauge(const MetricKey& key);
 
@@ -29,7 +30,7 @@ class Gauge final : public Metric {
 ///
 class GaugeBuilder : public MetricBuilder<Gauge, GaugeBuilder> {
  public:
-  virtual Gauge& get() override { return build(); };
+  virtual Gauge& get() override { return build(Metric::Type::Gauge); };
   virtual void   measure(double value) override { get().measure(value); }
 };
 

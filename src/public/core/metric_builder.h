@@ -38,9 +38,9 @@ struct MetricBuilder {
 
  protected:
   template <typename... Args>
-  M& build(Args&&... args) {
+  M& build(Metric::Type type, Args&&... args) {
     return MetricRegistry::instance()  //
-        .ensureExist<M>(key_, std::forward<Args>(args)...);
+        .ensureExist<M>(type, key_, std::forward<Args>(args)...);
   }
 };
 

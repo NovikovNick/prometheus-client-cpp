@@ -5,6 +5,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "types.h"
@@ -18,13 +19,19 @@ namespace telemetry {
 /// https://prometheus.io/docs/concepts/metric_types/#histogram
 ///
 class Histogram final : public Metric {
-  std::mutex                mutex_;
-  double                    sum;
-  std::map<double, int64_t> buckets_;
+  std::mutex                              mutex_;
+  double                                  sum;
+  std::map<double, int64_t>               buckets_;
+  std::unordered_map<double, std::string> buckets_metric_description_;
+  std::string                             metric_description_;
+  std::string                             metric_sum_;
+  std::string                             metric_count_;
 
   Histogram(const MetricKey& key, const std::vector<double>& buckets);
 
  public:
+  std::map<double, int64_t> value();
+
   void measure(double value);
 
   virtual void collect(std::string& out) override;
@@ -44,7 +51,9 @@ class HistogramBuilder : public MetricBuilder<Histogram, HistogramBuilder> {
     return *this;
   }
 
-  virtual Histogram& get() override { return build(buckets_); };
+  virtual Histogram& get() override {
+    return build(Metric::Type::Histogram, buckets_);
+  };
 
   virtual void measure(double value) override { get().measure(value); }
 };

@@ -17,6 +17,7 @@ class CounterBuilder;
 ///
 class Counter final : public Metric {
   std::atomic<uint64_t> value_;
+  std::string           metric_description_;
 
   Counter(const MetricKey& key);
 
@@ -38,7 +39,7 @@ class Counter final : public Metric {
 ///
 class CounterBuilder : public MetricBuilder<Counter, CounterBuilder> {
  public:
-  virtual Counter& get() override { return build(); };
+  virtual Counter& get() override { return build(Metric::Type::Counter); };
   virtual void     measure(double value) override { get().measure(value); }
 };
 

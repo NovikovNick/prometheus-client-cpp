@@ -7,9 +7,12 @@ namespace telemetry {
 Summary::Summary(const MetricKey&           key,
                  std::chrono::milliseconds  sliding_time_window,
                  const std::vector<double>& quantiles)
-    : Metric(key),  //
+    : Metric(Type::Summary, key),  //
       sliding_time_window_(sliding_time_window),
-      quantiles_(quantiles){};
+      quantiles_(quantiles),
+      metric_description_(""),
+      metric_sum_(""),
+      metric_count_(""){};
 
 void Summary::measure(double value) {
   Timepoint now     = Clock::now();
@@ -26,6 +29,23 @@ void Summary::measure(double value) {
 };
 
 void Summary::collect(std::string& out) {
+  if (metric_description_.empty()) {
+    metric_description_ = std::format(
+        "# HELP {} {}\n"
+        "# TYPE {} summary\n",
+        key_.name,
+        key_.description,
+        key_.name);
+    metric_sum_   = std::format("{}_sum ", key_.name);
+    metric_count_ = std::format("{}_count ", key_.name);
+
+    for (auto quantile : quantiles_) {
+      quantiles_metric_description_[quantile] =
+          key_.name  //
+          + labelsToString({{"quantile", std::to_string(quantile)}});
+    }
+  }
+
   // usage of vector here not optimal, but more clearly to read
   std::vector<double> tmp_vector;
   size_t              count = 0;
@@ -43,8 +63,7 @@ void Summary::collect(std::string& out) {
     }
   }
 
-  out += std::format("# HELP {} {}\n", key_.name, key_.description);
-  out += std::format("# TYPE {} summary\n", key_.name);
+  out += metric_description_;
 
   for (auto quantile : quantiles_) {
     double index      = (count - 1) * quantile;
@@ -61,14 +80,13 @@ void Summary::collect(std::string& out) {
       auto d1 = tmp_vector[index_high] * (index - index_low);
       value   = d0 + d1;
     }
-    out += std::format("{}", key_.name);
-    key_.labels["quantile"] = std::to_string(quantile);
-    collectLabels(out);
-    out += std::format(" {}\n", value);
+
+    out += quantiles_metric_description_[quantile];
+    out += ' ' + std::to_string(value) + '\n';
   }
 
-  out += std::format("{}_sum {}\n", key_.name, sum);
-  out += std::format("{}_count {}\n", key_.name, count);
+  out += metric_sum_ + std::to_string(sum) + '\n';
+  out += metric_count_ + std::to_string(count) + '\n';
 };
 
 }  // namespace telemetry

@@ -1,5 +1,7 @@
 add_executable(telemetry_test
   counter_test.cc
+  histogram_test.cc
+  general_test.cc
 )
 
 target_link_libraries(telemetry_test

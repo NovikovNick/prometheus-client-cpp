@@ -5,6 +5,7 @@
 #include <mutex>
 #include <queue>
 #include <set>
+#include <unordered_map>
 #include <vector>
 
 #include "types.h"
@@ -27,6 +28,10 @@ class Summary final : public Metric {
   std::chrono::milliseconds sliding_time_window_;
   std::queue<std::pair<Timepoint, std::set<double>::iterator>> refs_;
   std::vector<double>                                          quantiles_;
+  std::unordered_map<double, std::string> quantiles_metric_description_;
+  std::string                             metric_description_;
+  std::string                             metric_sum_;
+  std::string                             metric_count_;
 
   Summary(const MetricKey           &key,
           std::chrono::milliseconds  sliding_time_window,
@@ -59,7 +64,7 @@ class SummaryBuilder : public MetricBuilder<Summary, SummaryBuilder> {
   }
 
   virtual Summary &get() override {
-    return build(sliding_time_window_, quantiles_);
+    return build(Metric::Type::Summary, sliding_time_window_, quantiles_);
   };
 
   virtual void measure(double value) override { get().measure(value); };
